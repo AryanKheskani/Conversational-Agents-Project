@@ -1,0 +1,10 @@
+openai-whisper
+librosa
+langchain
+langchain-community
+faiss-cpu
+sentence-transformers
+pyaudio
+soundfile
+numpy
+pandas
