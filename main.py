@@ -7,6 +7,7 @@ warnings.filterwarnings("ignore")
 from perception.audio_asr import record_audio, transcribe_audio
 from perception.audio_prosody import analyze_prosody
 from agent.fusion_engine import ModalityFusionEngine
+from agent.coach_llm import DatingCoach, CoachMode
 from memory.stm_buffer import STMBuffer
 from memory.vector_db import LongTermMemory
 from memory.retrieval import MemoryRetriever, end_session
@@ -21,21 +22,39 @@ def _handle_sigint(sig, frame):
 
 signal.signal(signal.SIGINT, _handle_sigint)
 
+def pick_mode() -> CoachMode:
+    """Ask the user which coaching mode to use at session start."""
+    print("Select coaching mode:")
+    print("  [1] General coaching")
+    print("  [2] Pre-date roleplay")
+    print("  [3] Post-date reflection")
+    choice = input("\nEnter 1, 2 or 3 (default: 1): ").strip()
+    return {
+        "2": CoachMode.PREDATE,
+        "3": CoachMode.POSTDATE,
+    }.get(choice, CoachMode.GENERAL)
+
 
 def main():
     print("Welcome to the Multimodal Dating Coach Agent!")
     print("Press Ctrl+C at any time to stop.\n")
+
+    # -- Mode selection --
+    mode = pick_mode()
+    print()
 
     engine = ModalityFusionEngine()
     session_id = f"session_{int(time.time())}"
     stm       = STMBuffer(max_turns=10, session_id=session_id)
     ltm       = LongTermMemory(storage_path="memory/ltm_store")
     retriever = MemoryRetriever(stm, ltm)
+    coach     = DatingCoach(mode=mode)
 
     # Prune stale memories from previous sessions at startup
     ltm.prune()
 
     print(f"Session: {session_id}")
+    print(f"Mode: {mode.value}")
     print(f"LTM: {len(ltm)} memories loaded from previous sessions\n")
 
     while not _shutdown:
@@ -49,6 +68,11 @@ def main():
             print("⏳ Transcribing...")
             text_transcript = transcribe_audio(audio_file)
             if _shutdown: break
+
+            # Skip empty recordings
+            if not text_transcript.strip():
+                print("(no speech detected, listening again...)\n")
+                continue
 
             # 3. Extract Prosody (Affect/Tone)
             print("⏳ Analyzing tone...")
@@ -82,6 +106,13 @@ def main():
                           else f"[{entry.emotional_label}]"
                     print(f"   {tag} {entry.text[:80]}")
 
+            # Generate and display coach response
+            print()
+            print("⏳ Coach thinking...")
+            response = coach.respond(result, context)
+            stm.add_agent_turn(response)
+
+            print(f"\n🎯 Coach    : {response}")
             print("="*50 + "\n")
             
         finally:
@@ -91,6 +122,29 @@ def main():
 
         # Brief pause before the next iteration
         time.sleep(1)
+
+    # Post-date reflection on exit (if not already in that mode)
+    if mode != CoachMode.POSTDATE and len(stm.get_user_turns()) > 0:
+        print("\n\nGenerating session reflection...")
+        # Build a final context snapshot using the last user turn if available
+        last_turns = stm.get_user_turns()
+        if last_turns:
+            last_turn = last_turns[-1]
+
+            # Create a minimal fused-like object from the stored turn
+            class _FusedProxy:
+                def __init__(self, turn):
+                    self.text                  = turn.text
+                    self.emotional_label       = turn.emotional_label
+                    self.emotional_valence     = turn.emotional_valence
+                    self.emotional_arousal     = turn.emotional_arousal
+                    self.fusion_confidence     = turn.fusion_confidence
+                    self.has_semantic_conflict = turn.has_conflict
+                    self.conflict_note         = ""
+
+            final_context = retriever.build_context(_FusedProxy(last_turn))
+            reflection    = coach.reflect(final_context)
+            print(f"\n📋 Session Reflection:\n{reflection}\n")
 
     print("\n\nWrapping up session...")
     summary = end_session(stm, ltm, salience_floor=0.6, run_prune=True)

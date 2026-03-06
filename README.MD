@@ -17,8 +17,45 @@ Unlike standard text-based bots, this agent employs **Multimodal Acoustic-Semant
 
 ---
 
+## How It Works
+
+```
+Microphone
+    │
+    ├──► Whisper (audio_asr.py)       → transcript
+    └──► Librosa (audio_prosody.py)   → prosody label
+                    │
+                    ▼
+          Fusion Engine (fusion_engine.py)
+          ┌─────────────────────────────┐
+          │ HuggingFace emotion model   │
+          │ + negation detection        │
+          │ + conflict detection        │
+          └────────────┬────────────────┘
+                       │ FusedRepresentation
+                       ▼
+          Memory Layer (memory/)
+          ┌─────────────────────────────┐
+          │ STM: sliding turn buffer    │
+          │ LTM: FAISS + forgetting     │
+          │ Retriever: affect-aware RAG │
+          └────────────┬────────────────┘
+                       │ context dict
+                       ▼
+          Coach LLM (coach_llm.py)
+          ┌─────────────────────────────┐
+          │ Llama 3.2 via Ollama        │
+          │ Mode-specific system prompt │
+          └─────────────────────────────┘
+                       │
+                       ▼
+                 Coach response
+```
+
+---
+
 ## Prerequisites
-* Python 3.9+
+* Python 3.10+
 * A working microphone
 * [Ollama](https://ollama.com/) installed on your machine
 
@@ -26,34 +63,57 @@ Unlike standard text-based bots, this agent employs **Multimodal Acoustic-Semant
 
 ## Setup Instructions
 
-**1. Clone or Initialize the Repository**
+### 1. Clone the repository
 ```bash
-mkdir Conversational-Agents-Project
+git clone 
 cd Conversational-Agents-Project
+```
 
-**2. Create a Virtual Environment**
-# Windows
-python -m venv venv
-venv\Scripts\activate
+### 2. Install system dependencies (macOS)
+```bash
+brew install portaudio ffmpeg ollama
+```
 
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
+### 3. Create and activate a virtual environment
+```bash
+python3 -m venv .venv
+source .venv/bin/activate        # Mac/Linux
+.venv\Scripts\activate           # Windows
+```
 
-**3. Install Dependencies**
+### 4. Install Python dependencies
+```bash
 pip install -r requirements.txt
+```
 
-**4. Setup the Local LLM (Llama 3.2)**
-ollama run llama3.2
+### 5. Pull the local LLM
+```bash
+ollama pull llama3.2
+```
 
-**5. Start the Agent**
-python main.py
+### 6. Run the agent
+```bash
+# In one terminal, keep running:
+ollama serve
 
-**6. Brew Installations**
-brew install portaudio
-brew install ollama
-brew install ffmpeg
+# In another terminal:
+python3 main.py
+```
 
+You will be prompted to select a coaching mode before the session begins.
+
+---
+
+## Running Tests
+
+Tests do not require a microphone and can be run independently:
+```bash
+python3 -m tests.test_fusion    # fusion engine
+python3 -m tests.test_memory    # memory layer (STM + LTM)
+python3 -m tests.test_coach     # coach LLM (requires ollama serve)
+```
+
+---
 
 ## Setup Instructions
 
@@ -63,14 +123,21 @@ Conversational-Agents-Project/
 │   ├── audio_asr.py      # Transcribes speech to text using Whisper
 │   └── audio_prosody.py  # Extracts tone/emotion using Librosa
 │
-├── memory/               # Hybrid Memory Architecture
-│   ├── vector_db.py      # FAISS setup for Long-Term Memory
-│   ├── stm_buffer.py     # LangChain buffer for Short-Term Memory
-│   └── retrieval.py      # Affect-aware retrieval logic
-│
 ├── agent/                # Core Agent Logic
 │   ├── fusion_engine.py  # Compares Text vs. Tone for conflict detection
 │   └── coach_llm.py      # LangChain connection to local Ollama instance
+│
+├── memory/
+│   ├── models.py             # Shared dataclasses (MemoryTurn, MemoryEntry)
+│   ├── stm_buffer.py         # Short-term sliding window buffer
+│   ├── embedder.py           # Affect-aware sentence embeddings + forgetting curve
+│   ├── vector_db.py          # FAISS long-term store with pruning + predict-calibrate
+│   └── retrieval.py          # LTM trigger logic + LLM context assembly
+│
+├── tests/
+│   ├── test_fusion.py        # Fusion engine unit tests
+│   ├── test_memory.py        # Memory layer integration tests
+│   └── test_coach.py         # Coach LLM mode tests (no mic needed)
 │
 ├── data/                 # Local Storage (Excluded from version control)
 │   ├── faiss_index/      # Persistent memory embeddings
