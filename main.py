@@ -43,7 +43,10 @@ def main():
     mode = pick_mode()
     print()
 
-    engine = ModalityFusionEngine()
+    print("Use prosodic analysis? (adds tone detection)")
+    use_prosody = input("Enable prosody [Y/n]: ").strip().lower() != "n"
+    engine = ModalityFusionEngine(use_prosody=use_prosody)
+
     session_id = f"session_{int(time.time())}"
     stm       = STMBuffer(max_turns=10, session_id=session_id)
     ltm       = LongTermMemory(storage_path="memory/ltm_store")
@@ -61,7 +64,7 @@ def main():
         audio_file = None
         try:
             # 1. Record Audio (using the record_audio function from audio_asr.py)
-            audio_file = record_audio(record_seconds=5)
+            audio_file = record_audio()
             if _shutdown: break
             
             # 2. Extract Transcription (Semantics)

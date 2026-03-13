@@ -229,11 +229,13 @@ class ModalityFusionEngine:
             prosody_config: Optional[ProsodyConfig]  = None,
             fusion_config:  Optional[FusionConfig]   = None,
             semantic_analyzer: Optional[SemanticAnalyzer] = None,
+            use_prosody: bool = True,
     ):
         self.prosody_cfg  = prosody_config   or ProsodyConfig()
         self.fusion_cfg   = fusion_config    or FusionConfig()
         self.analyzer     = semantic_analyzer or SemanticAnalyzer()
         self.conflict_det = ConflictDetector(self.fusion_cfg)
+        self.use_prosody = use_prosody
 
     # Public API
     def fuse(self, transcript: str, prosody_label: str) -> FusedRepresentation:
@@ -244,33 +246,43 @@ class ModalityFusionEngine:
         sem_valence, sem_arousal, sem_reliability = self.analyzer.analyze(transcript)
 
         # Prosodic signal
-        pro_valence, pro_arousal = self.prosody_cfg.label_map.get(
-            prosody_label, self.prosody_cfg.fallback
-        )
-        pro_reliability = self.prosody_cfg.reliability_map.get(
-            prosody_label, self.prosody_cfg.fallback_reliability
-        )
+        if self.use_prosody and prosody_label:
+            pro_valence, pro_arousal = self.prosody_cfg.label_map.get(
+                prosody_label, self.prosody_cfg.fallback
+            )
+            pro_reliability = self.prosody_cfg.reliability_map.get(
+                prosody_label, self.prosody_cfg.fallback_reliability
+            )
 
-        # Conflict detection
-        conflict = self.conflict_det.has_conflict(
-            sem_valence, pro_valence, transcript, prosody_label,
-            semantic_arousal=sem_arousal, prosodic_arousal=pro_arousal
-        )
-
-        # Compute fusion weights
-        if conflict:
-            w_sem = self.fusion_cfg.conflict_semantic_weight
-            w_pro = self.fusion_cfg.conflict_prosody_weight
-            dominant = "prosodic"
-            conflict_note = (
-                f"Valence gap {abs(sem_valence - pro_valence):.2f} — "
-                f"trusting prosody (vocal tone harder to fake)"
+            # Conflict detection
+            conflict = self.conflict_det.has_conflict(
+                sem_valence, pro_valence, transcript, prosody_label,
+                semantic_arousal=sem_arousal, prosodic_arousal=pro_arousal
             )
         else:
-            total = sem_reliability + pro_reliability
-            w_sem = sem_reliability / total if total > 0 else 0.5
-            w_pro = pro_reliability / total if total > 0 else 0.5
-            dominant = "prosodic" if pro_reliability > sem_reliability else "semantic"
+            # No prosodic contribution
+            pro_valence, pro_arousal, pro_reliability = sem_valence, sem_arousal, 0.0
+            conflict = False
+
+        # Compute fusion weights
+        if self.use_prosody and prosody_label:
+            if conflict:
+                w_sem = self.fusion_cfg.conflict_semantic_weight
+                w_pro = self.fusion_cfg.conflict_prosody_weight
+                dominant = "prosodic"
+                conflict_note = (
+                    f"Valence gap {abs(sem_valence - pro_valence):.2f} — "
+                    f"trusting prosody (vocal tone harder to fake)"
+                )
+            else:
+                total = sem_reliability + pro_reliability
+                w_sem = sem_reliability / total if total > 0 else 0.5
+                w_pro = pro_reliability / total if total > 0 else 0.5
+                dominant = "prosodic" if pro_reliability > sem_reliability else "semantic"
+                conflict_note = ""
+        else:
+            w_sem, w_pro = 1.0, 0.0
+            dominant = "semantic"
             conflict_note = ""
 
         # Weighted fusion
@@ -278,7 +290,8 @@ class ModalityFusionEngine:
         fused_arousal = np.clip(w_sem * sem_arousal + w_pro * pro_arousal,  0.0, 1.0)
 
         # Confidence
-        fusion_confidence = (sem_reliability + pro_reliability) / 2
+        fusion_confidence = sem_reliability if not (self.use_prosody and prosody_label) \
+                                            else (sem_reliability + pro_reliability) / 2
         if conflict:
             fusion_confidence *= self.fusion_cfg.conflict_confidence_penalty
 
@@ -312,8 +325,8 @@ class ModalityFusionEngine:
                 "Make sure audio_asr.py and audio_prosody.py are on your path."
             ) from e
 
-        transcript    = transcribe_audio(audio_path)
-        prosody_label = analyze_prosody(audio_path)
+        transcript = transcribe_audio(audio_path)
+        prosody_label = analyze_prosody(audio_path) if self.use_prosody else None
         return self.fuse(transcript, prosody_label)
 
 

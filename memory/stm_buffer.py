@@ -85,12 +85,12 @@ class STMBuffer:
         """Only user turns — used for LTM consolidation."""
         return [t for t in self._buffer if t.role == "user"]
 
-    def get_salient_turns(self, threshold: float = 0.6) -> List[MemoryTurn]:
+    def get_salient_turns(self, threshold: float = 0.5) -> List[MemoryTurn]:
         """
         Turns above a salience threshold.
         These are the candidates for LTM storage at session end.
         """
-        return [t for t in self._buffer if t.salience >= threshold]
+        return [t for t in self._buffer if t.salience >= threshold and t.role == "user"]
 
     def to_langchain_messages(self) -> List[Dict]:
         """

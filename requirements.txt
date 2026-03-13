@@ -10,3 +10,5 @@ numpy
 pandas
 transformers
 requests
+pyttsx3
+flask-socketio
