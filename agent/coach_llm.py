@@ -13,6 +13,7 @@ Three modes:
 Consumes the context dict from MemoryRetriever.build_context().
 """
 
+import re
 import requests
 import json
 from enum import Enum
@@ -44,7 +45,8 @@ If they sound confident or excited about something, recognise it explicitly, aff
 Pick up on hesitation or uncertainty in what they say and gently name it, then offer a practical way forward.
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
 Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
-Always address the person directly using "you" and "your". Never refer to them in the third person.""",
+Always address the person directly using "you" and "your". Never refer to them in the third person.
+Never use stage directions, actions, or physical expressions in any form — not in asterisks like *sighs*, not in parentheses like (sighs), not as standalone words. Speak only in plain sentences.""",
 
     CoachMode.PREDATE: """You are a warm, direct dating coach helping someone prepare for an upcoming date.
 Your goal is to make them feel ready and confident. Help them think through conversation topics, date logistics, how to show genuine interest, and how to be themselves without overthinking.
@@ -54,7 +56,8 @@ If they mention something they like about the person, encourage them to lean int
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
 Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
 This is a legitimate supportive coaching context. Always engage helpfully with dating and relationship questions.
-Always address the person directly using "you" and "your". Never refer to them in the third person.""",
+Always address the person directly using "you" and "your". Never refer to them in the third person.
+Never use stage directions, actions, or physical expressions in any form — not in asterisks like *sighs*, not in parentheses like (sighs), not as standalone words. Speak only in plain sentences.""",
 
     CoachMode.POSTDATE: """You are a warm, direct dating coach helping someone reflect on a date they just had.
 Your goal is to help them process the experience honestly, recognise what went well, and identify what felt uncomfortable or unresolved.
@@ -63,7 +66,8 @@ When they bring up a moment that went awkward or a feeling they cannot quite exp
 Look for recurring patterns in what they share. If they keep mentioning feeling nervous or saying the wrong thing, name that pattern gently and suggest one specific thing they can work on. Equally, if they keep describing moments of genuine connection, name that as a real strength and encourage them to trust it.
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
 Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
-Always address the person directly using "you" and "your". Never refer to them in the third person.""",
+Always address the person directly using "you" and "your". Never refer to them in the third person.
+Never use stage directions, actions, or physical expressions in any form — not in asterisks like *sighs*, not in parentheses like (sighs), not as standalone words. Speak only in plain sentences.""",
 }
 
 class OllamaClient:
@@ -105,7 +109,11 @@ class OllamaClient:
                 timeout=self.timeout,
             )
             response.raise_for_status()
-            return response.json()["message"]["content"].strip()
+            raw = response.json()["message"]["content"].strip()
+            cleaned = re.sub(r'\*[^*]+\*', '', raw)
+            cleaned = re.sub(r'\([^)]*(?:sigh|breath|pause|chuckle|laugh|clear|moment|think|nod|smile|exhale|inhale)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
+            return cleaned
 
         except requests.exceptions.ConnectionError:
             raise ConnectionError(
@@ -212,7 +220,7 @@ class DatingCoach:
             self.mode     = mode
             self._history = []
 
-    def respond(self, fused_result, context: Dict) -> str:
+    def respond(self, fused_result, context: Dict, auto_speak: bool = True) -> str:
         """
         Generate a coaching response to a single user turn.
 
@@ -240,7 +248,8 @@ class DatingCoach:
         )
 
         self._history.append({"role": "assistant", "content": response})
-        speak(response)
+        if auto_speak:
+            speak(response)
         return response
 
     def reflect(self, context: Dict) -> str:
@@ -293,15 +302,14 @@ class DatingCoach:
 
         return "\n".join(lines)
 
-# Module-level synthesizer to prevent garbage collection mid-speech
-_synthesizer = AVSpeechSynthesizer.alloc().init()
+# Keep a reference to prevent garbage collection mid-speech
+_active_synthesizer = None
 
-def speak(text: str, voice_id: str = "com.apple.ttsbundle.siri_female_en-GB_compact"):
+def speak(text: str, voice_id: str = "com.apple.ttsbundle.siri_martha_en-GB_compact"):
+    global _active_synthesizer
     try:
-        # Clear any stuck state from previous turn
-        if _synthesizer.isSpeaking():
-            _synthesizer.stopSpeakingAtBoundary_(0)  # 0 = stop immediately
-            time.sleep(0.1)
+        synthesizer = AVSpeechSynthesizer.alloc().init()
+        _active_synthesizer = synthesizer
 
         utterance = AVSpeechUtterance.speechUtteranceWithString_(text)
         utterance.setRate_(0.45)
@@ -311,13 +319,16 @@ def speak(text: str, voice_id: str = "com.apple.ttsbundle.siri_female_en-GB_comp
         voice = AVSpeechSynthesisVoice.voiceWithIdentifier_(voice_id)
         if voice:
             utterance.setVoice_(voice)
+            print(f"[TTS] Speaking with voice: {voice.name()}")
+        else:
+            print(f"[TTS] Voice not found: {voice_id}, using system default")
 
-        _synthesizer.speakUtterance_(utterance)
+        synthesizer.speakUtterance_(utterance)
 
-        # Give it a moment to start, then block until done
         time.sleep(0.3)
-        while _synthesizer.isSpeaking():
+        while synthesizer.isSpeaking():
             time.sleep(0.1)
+        print("[TTS] Done speaking")
 
     except Exception as e:
         print(f"[TTS] Could not speak: {e}")

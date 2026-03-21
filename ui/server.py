@@ -236,11 +236,24 @@ def _run_turn():
             socketio.emit("memories_retrieved", {"memories": memories})
 
         # Coach response
-        socketio.emit("status", {"msg": "Coach thinking..."})
-        response = _session["coach"].respond(result, context)
+        socketio.emit("coach_thinking", {})
+        response = _session["coach"].respond(result, context, auto_speak=False)
         _session["stm"].add_agent_turn(response)
 
-        socketio.emit("coach_response", {"text": response})
+        # Start TTS and word streaming simultaneously
+        from agent.coach_llm import speak as tts_speak
+        tts_thread = threading.Thread(target=tts_speak, args=(response,), daemon=True)
+        tts_thread.start()
+
+        # Stream words to browser at ~380ms per word (matches rate 0.45 speech)
+        words = response.split(" ")
+        socketio.emit("coach_response_start", {})
+        time.sleep(0.3)  # match TTS startup delay
+        for word in words:
+            socketio.emit("coach_word", {"word": word})
+            time.sleep(0.38)
+
+        tts_thread.join()
         socketio.emit("status", {"msg": "Hold SPACE to speak  |  Q to quit"})
 
     except Exception as e:
