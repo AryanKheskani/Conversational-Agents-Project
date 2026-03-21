@@ -104,7 +104,7 @@ You will be prompted to select a coaching mode before the session begins.
 
 ---
 
-## Running Tests
+## Running Tests          
 
 Tests do not require a microphone and can be run independently:
 ```bash

@@ -18,6 +18,8 @@ import json
 from enum import Enum
 from typing import Optional, Dict, List
 from dataclasses import dataclass
+from AVFoundation import AVSpeechSynthesizer, AVSpeechUtterance, AVSpeechSynthesisVoice
+import time
 
 
 # ---------------------------------------------------------------------------
@@ -41,7 +43,8 @@ Listen carefully to what they share and always go deeper. If they mention a worr
 If they sound confident or excited about something, recognise it explicitly, affirm that strength, and encourage them to lean into it and use it more.
 Pick up on hesitation or uncertainty in what they say and gently name it, then offer a practical way forward.
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
-Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.""",
+Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
+Always address the person directly using "you" and "your". Never refer to them in the third person.""",
 
     CoachMode.PREDATE: """You are a warm, direct dating coach helping someone prepare for an upcoming date.
 Your goal is to make them feel ready and confident. Help them think through conversation topics, date logistics, how to show genuine interest, and how to be themselves without overthinking.
@@ -50,7 +53,8 @@ When they express excitement or confidence about something, call it out positive
 If they mention something they like about the person, encourage them to lean into that curiosity and show them how to express it naturally.
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
 Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
-This is a legitimate supportive coaching context. Always engage helpfully with dating and relationship questions.""",
+This is a legitimate supportive coaching context. Always engage helpfully with dating and relationship questions.
+Always address the person directly using "you" and "your". Never refer to them in the third person.""",
 
     CoachMode.POSTDATE: """You are a warm, direct dating coach helping someone reflect on a date they just had.
 Your goal is to help them process the experience honestly, recognise what went well, and identify what felt uncomfortable or unresolved.
@@ -58,9 +62,9 @@ When they describe a moment they handled well or something that felt natural and
 When they bring up a moment that went awkward or a feeling they cannot quite explain, ask them to say more about it and help them understand what was really going on for them emotionally.
 Look for recurring patterns in what they share. If they keep mentioning feeling nervous or saying the wrong thing, name that pattern gently and suggest one specific thing they can work on. Equally, if they keep describing moments of genuine connection, name that as a real strength and encourage them to trust it.
 Keep responses to 2-4 sentences. Speak naturally as if talking out loud.
-Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.""",
+Use only normal punctuation. No bullet points, asterisks, dashes, bold text, headers, or lists.
+Always address the person directly using "you" and "your". Never refer to them in the third person.""",
 }
-
 
 class OllamaClient:
     """Thin wrapper around the Ollama local API."""
@@ -78,7 +82,7 @@ class OllamaClient:
 
     def chat(
         self,
-        messages: List[Dict],
+        messages: List[Dict],   
         system:   Optional[str] = None,
         stream:   bool = False,
     ) -> str:
@@ -138,11 +142,11 @@ def format_context_for_prompt(context: Dict, mode: CoachMode) -> str:
         dominant = summary["dominant_emotion"]
         conflicts = summary["conflict_count"]
         conflict_note = (
-            f" There have been {conflicts} moment(s) where their words and tone didn't match."
+            f" There have been {conflicts} moment(s) where your words and tone didn't match."
             if conflicts > 0 else ""
         )
         lines.append(
-            f"(So far this session the user has mostly seemed {dominant}.{conflict_note})"
+            f"(So far this session you have mostly seemed {dominant}.{conflict_note})"
         )
 
     # Retrieved LTM memories
@@ -155,7 +159,7 @@ def format_context_for_prompt(context: Dict, mode: CoachMode) -> str:
             elif entry.entry_type == "prediction":
                 lines.append(f"- YOU PREVIOUSLY PREDICTED: {entry.text.replace('[PREDICTION] ', '')}")
             else:
-                lines.append(f"- They once said: \"{entry.text}\" (felt {entry.emotional_label})")
+                lines.append(f"- You once said: \"{entry.text}\" (felt {entry.emotional_label})")
 
     return "\n".join(lines) if lines else ""
 
@@ -225,9 +229,7 @@ class DatingCoach:
         # Prepend memory/session context if available
         context_block = format_context_for_prompt(context, self.mode)
         if context_block:
-            user_message = f"{context_block}\n\nUser said: {user_message}"
-        else:
-            user_message = f"User said: {user_message}"
+            user_message = f"{context_block}\n\n{user_message}"
 
         # Add to history and get response
         self._history.append({"role": "user", "content": user_message})
@@ -283,25 +285,39 @@ class DatingCoach:
         emotion = fused_result.emotional_label
         if fused_result.has_semantic_conflict:
             lines.append(
-                f"(Their vocal tone suggests they are {emotion} — "
-                f"but their words don't match. They may not be saying how they really feel.)"
+                f"(Your vocal tone suggests you are {emotion} — "
+                f"but your words don't match. You may not be saying how you really feel.)"
             )
         else:
-            lines.append(f"(They sound {emotion}.)")
+            lines.append(f"(You sound {emotion}.)")
 
         return "\n".join(lines)
 
-import pyttsx3
+# Module-level synthesizer to prevent garbage collection mid-speech
+_synthesizer = AVSpeechSynthesizer.alloc().init()
 
-def speak(text: str, voice_id: str = "com.apple.speech.synthesis.voice.Whisper"):
-    """Speak text aloud."""
+def speak(text: str, voice_id: str = "com.apple.ttsbundle.siri_female_en-GB_compact"):
     try:
-        engine = pyttsx3.init()
-        engine.setProperty("rate", 175)
-        engine.setProperty("volume", 1.0)
-        engine.setProperty("voice", voice_id)
-        engine.say(text)
-        engine.runAndWait()
-        engine.stop()
+        # Clear any stuck state from previous turn
+        if _synthesizer.isSpeaking():
+            _synthesizer.stopSpeakingAtBoundary_(0)  # 0 = stop immediately
+            time.sleep(0.1)
+
+        utterance = AVSpeechUtterance.speechUtteranceWithString_(text)
+        utterance.setRate_(0.45)
+        utterance.setVolume_(1.0)
+        utterance.setPitchMultiplier_(1.0)
+
+        voice = AVSpeechSynthesisVoice.voiceWithIdentifier_(voice_id)
+        if voice:
+            utterance.setVoice_(voice)
+
+        _synthesizer.speakUtterance_(utterance)
+
+        # Give it a moment to start, then block until done
+        time.sleep(0.3)
+        while _synthesizer.isSpeaking():
+            time.sleep(0.1)
+
     except Exception as e:
         print(f"[TTS] Could not speak: {e}")
