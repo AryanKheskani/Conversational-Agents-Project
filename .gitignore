@@ -1,0 +1,17 @@
+# Memory store (LTM vector index + metadata)
+memory/ltm_store/
+
+# Temporary audio recordings
+*.wav
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Environment
+.env
+
+# macOS
+.DS_Store
