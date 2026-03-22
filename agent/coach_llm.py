@@ -19,8 +19,11 @@ import json
 from enum import Enum
 from typing import Optional, Dict, List
 from dataclasses import dataclass
-from AVFoundation import AVSpeechSynthesizer, AVSpeechUtterance, AVSpeechSynthesisVoice
-import time
+import subprocess
+import tempfile
+import asyncio
+import threading
+import edge_tts
 
 
 # ---------------------------------------------------------------------------
@@ -111,7 +114,7 @@ class OllamaClient:
             response.raise_for_status()
             raw = response.json()["message"]["content"].strip()
             cleaned = re.sub(r'\*[^*]+\*', '', raw)
-            cleaned = re.sub(r'\([^)]*(?:sigh|breath|pause|chuckle|laugh|clear|moment|think|nod|smile|exhale|inhale)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r'\([^)]*\)', '', cleaned)
             cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
             return cleaned
 
@@ -302,33 +305,28 @@ class DatingCoach:
 
         return "\n".join(lines)
 
-# Keep a reference to prevent garbage collection mid-speech
-_active_synthesizer = None
+_speak_lock = threading.Lock()
 
-def speak(text: str, voice_id: str = "com.apple.ttsbundle.siri_martha_en-GB_compact"):
-    global _active_synthesizer
-    try:
-        synthesizer = AVSpeechSynthesizer.alloc().init()
-        _active_synthesizer = synthesizer
+def speak(text: str, voice: str = "en-GB-SoniaNeural", rate: str = "-2%"):
+    ready = threading.Event()
 
-        utterance = AVSpeechUtterance.speechUtteranceWithString_(text)
-        utterance.setRate_(0.45)
-        utterance.setVolume_(1.0)
-        utterance.setPitchMultiplier_(1.0)
+    def _run():
+        async def _download():
+            communicate = edge_tts.Communicate(text, voice, rate=rate)
+            with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+                tmp_path = f.name
+            await communicate.save(tmp_path)
+            return tmp_path
 
-        voice = AVSpeechSynthesisVoice.voiceWithIdentifier_(voice_id)
-        if voice:
-            utterance.setVoice_(voice)
-            print(f"[TTS] Speaking with voice: {voice.name()}")
-        else:
-            print(f"[TTS] Voice not found: {voice_id}, using system default")
+        try:
+            tmp_path = asyncio.run(_download())
+            with _speak_lock:
+                ready.set()  # signal: audio is about to start
+                subprocess.run(["afplay", tmp_path])
+            print("[TTS] Done speaking")
+        except Exception as e:
+            ready.set()  # unblock caller even on error
+            print(f"[TTS] Could not speak: {e}")
 
-        synthesizer.speakUtterance_(utterance)
-
-        time.sleep(0.3)
-        while synthesizer.isSpeaking():
-            time.sleep(0.1)
-        print("[TTS] Done speaking")
-
-    except Exception as e:
-        print(f"[TTS] Could not speak: {e}")
+    threading.Thread(target=_run, daemon=True).start()
+    ready.wait()  # block until afplay is about to launch
