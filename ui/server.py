@@ -25,6 +25,7 @@ from agent.coach_llm import DatingCoach, CoachMode
 from memory.stm_buffer import STMBuffer
 from memory.vector_db import LongTermMemory
 from memory.retrieval import MemoryRetriever, end_session
+from memory.session_logger import SessionLogger
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.config["SECRET_KEY"] = "dating-coach-secret"
@@ -91,6 +92,9 @@ def on_init_session(data):
 
     _session["ltm"].prune()
 
+    _session["logger"] = SessionLogger(session_id)
+    _session["logger"].set_meta(mode_str, use_prosody)
+
     # Send past memories to browser
     past = _get_past_memories()
 
@@ -136,6 +140,7 @@ def on_end_session():
 
     stm = _session["stm"]
     ltm = _session["ltm"]
+    reflection = None
 
     # Generate reflection if not in postdate mode
     if _session["mode"] != "postdate" and stm and len(stm.get_user_turns()) > 0:
@@ -156,8 +161,12 @@ def on_end_session():
         reflection = _session["coach"].reflect(ctx)
         emit("reflection", {"text": reflection})
 
+    if reflection:
+        _session["logger"].log_reflection(reflection)
+
     summary = end_session(stm, ltm, salience_floor=0.4, run_prune=True)
     _session["running"] = False
+    _session["logger"].close(summary)
 
     emit("session_ended", {
         "memories_stored": summary["memories_stored"],
@@ -213,6 +222,10 @@ def _run_turn():
             "salience":   _session["stm"].get_user_turns()[-1].salience,
         })
 
+        _session["logger"].log_user_turn(result,
+                                         salience=_session["stm"].get_user_turns()[-1].salience,
+                                         tone=tone)
+
         # Memory retrieval
         context = _session["retriever"].build_context(result)
         if context["ltm_triggered"] and context["retrieved_entries"]:
@@ -234,11 +247,14 @@ def _run_turn():
                 )
             ]
             socketio.emit("memories_retrieved", {"memories": memories})
+            _session['logger'].log_retrieved_memories(memories)
 
         # Coach response
         socketio.emit("coach_thinking", {})
         response = _session["coach"].respond(result, context, auto_speak=False)
         _session["stm"].add_agent_turn(response)
+
+        _session["logger"].log_agent_turn(response)
 
         # Start TTS and word streaming simultaneously
         from agent.coach_llm import speak as tts_speak
