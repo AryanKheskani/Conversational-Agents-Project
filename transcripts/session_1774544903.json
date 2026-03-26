@@ -1,0 +1,19 @@
+{
+  "session_id": "session_1774544903",
+  "mode": "general",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello, how are you doing?",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.254,
+      "arousal": 0.318
+    },
+    {
+      "role": "agent",
+      "text": "I'm functioning within normal parameters. Thank you for inquiring about my status."
+    }
+  ]
+}

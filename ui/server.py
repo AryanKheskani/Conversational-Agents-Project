@@ -10,6 +10,7 @@ State is pushed to the browser via Flask-SocketIO events.
 import os
 import sys
 import time
+import json
 import threading
 import signal
 
@@ -41,6 +42,8 @@ _session = {
     "use_prosody": True,
     "running": False,
     "recording": False,
+    "session_id": None,
+    "transcript": [],
 }
 _pipeline_thread = None
 _shutdown = threading.Event()
@@ -88,6 +91,8 @@ def on_init_session(data):
     _session["mode"] = mode_str
     _session["use_prosody"] = use_prosody
     _session["running"] = True
+    _session["session_id"] = session_id
+    _session["transcript"] = []
 
     _session["ltm"].prune()
 
@@ -159,6 +164,22 @@ def on_end_session():
     summary = end_session(stm, ltm, salience_floor=0.4, run_prune=True)
     _session["running"] = False
 
+    # Save transcript to JSON
+    if _session["transcript"]:
+        transcripts_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "transcripts"
+        )
+        os.makedirs(transcripts_dir, exist_ok=True)
+        transcript_data = {
+            "session_id":  _session["session_id"],
+            "mode":        _session["mode"],
+            "use_prosody": _session["use_prosody"],
+            "turns":       _session["transcript"],
+        }
+        path = os.path.join(transcripts_dir, f"{_session['session_id']}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(transcript_data, f, indent=2, ensure_ascii=False)
+
     emit("session_ended", {
         "memories_stored": summary["memories_stored"],
         "memories_pruned": summary["memories_pruned"],
@@ -213,6 +234,18 @@ def _run_turn():
             "salience":   _session["stm"].get_user_turns()[-1].salience,
         })
 
+        # Record user turn in transcript
+        user_entry = {
+            "role":   "user",
+            "text":   transcript,
+            "mode":   "prosody+semantic" if _session["use_prosody"] else "semantic",
+            "emotion": result.emotional_label,
+        }
+        if _session["use_prosody"]:
+            user_entry["valence"] = round(result.emotional_valence, 3)
+            user_entry["arousal"] = round(result.emotional_arousal, 3)
+        _session["transcript"].append(user_entry)
+
         # Memory retrieval
         context = _session["retriever"].build_context(result)
         if context["ltm_triggered"] and context["retrieved_entries"]:
@@ -240,20 +273,11 @@ def _run_turn():
         response = _session["coach"].respond(result, context, auto_speak=False)
         _session["stm"].add_agent_turn(response)
 
-        # Start TTS and word streaming simultaneously
-        from agent.coach_llm import speak as tts_speak
-        tts_thread = threading.Thread(target=tts_speak, args=(response,), daemon=True)
-        tts_thread.start()
+        # Record agent turn in transcript
+        _session["transcript"].append({"role": "agent", "text": response})
 
-        # Stream words to browser at ~380ms per word (matches rate 0.45 speech)
-        words = response.split(" ")
-        socketio.emit("coach_response_start", {})
-        time.sleep(0.3)  # match TTS startup delay
-        for word in words:
-            socketio.emit("coach_word", {"word": word})
-            time.sleep(0.38)
-
-        tts_thread.join()
+        # Send full response — TTS and word-reveal are handled client-side in sync
+        socketio.emit("coach_response_start", {"text": response})
         socketio.emit("status", {"msg": "Hold SPACE to speak  |  Q to quit"})
 
     except Exception as e:

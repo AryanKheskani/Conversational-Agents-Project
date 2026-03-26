@@ -522,6 +522,26 @@
       50%       { box-shadow: 0 0 0 8px rgba(206,66,87,0); }
     }
 
+    .voice-select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aaaaaa'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    .voice-select:focus { border-color: var(--accent); }
+
     .hidden { display: none !important; }
 
     /* Loading screen */
@@ -660,6 +680,16 @@
           </label>
         </div>
 
+        <div id="voicePresetWrap">
+          <div class="form-label">Voice</div>
+          <select id="voicePreset" class="voice-select">
+            <option value="warm_british_female">Warm British female</option>
+            <option value="neutral_american_female">Neutral American female</option>
+            <option value="casual_american_male">Casual American male</option>
+            <option value="dutch">Dutch (nl-NL)</option>
+          </select>
+        </div>
+
         <button class="start-btn" onclick="startSession()">Begin session</button>
       </div>
     </div>
@@ -700,6 +730,82 @@
 </div>
 
 <script>
+  // ── TTS ──────────────────────────────────────────────────────────────────
+  const VOICE_PRESETS = {
+    warm_british_female:    { voices: ["Google UK English Female", "Microsoft Hazel", "Martha"],             lang: "en-GB", rate: 1, pitch: 1.0  },
+    neutral_american_female:{ voices: ["Microsoft Zira", "Samantha", "Google US English"],                  lang: "en-US", rate: 1.0,  pitch: 1.0  },
+    casual_american_male:   { voices: ["Microsoft Guy", "Google US English Male", "Matthew", "Alex"],       lang: "en-US", rate: 0.98, pitch: 0.9  },
+    dutch:                  { voices: ["Google Nederlands", "Microsoft Frank", "Xander"],                   lang: "nl-NL", rate: 0.95, pitch: 0.85 },
+  };
+
+  function pickVoice(voices, candidates, lang) {
+    for (const fragment of candidates) {
+      const match = voices.find(v => v.name.toLowerCase().includes(fragment.toLowerCase()));
+      if (match) return match;
+    }
+    return voices.find(v => v.lang.startsWith(lang.split("-")[0])) || null;
+  }
+
+  let _wordRevealTimer = null;
+
+  function speakText(text, targetSpan) {
+    if (!text || !window.speechSynthesis) return;
+
+    const presetKey = document.getElementById("voicePreset").value;
+    const cfg = VOICE_PRESETS[presetKey] || VOICE_PRESETS.warm_british_female;
+
+    let t = text.trim();
+    if (t.startsWith("I am")) t = t.replace("I am", "I'm");
+    if (t.length > 40 && !/^(hmm|okay|alright)/i.test(t)) t = "Hmm\u2026 " + t;
+
+    window.speechSynthesis.cancel();
+    if (_wordRevealTimer) { clearInterval(_wordRevealTimer); _wordRevealTimer = null; }
+
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang   = cfg.lang;
+    u.rate   = cfg.rate;
+    u.pitch  = cfg.pitch;
+    u.volume = 1.0;
+
+    // Word-by-word reveal timed to TTS rate (400ms/word at rate 1.0)
+    const msPerWord = Math.round(400 / cfg.rate);
+    const words = t.split(" ");
+
+    function startWordReveal() {
+      if (!targetSpan) return;
+      let i = 0;
+      targetSpan.textContent = "";
+      _wordRevealTimer = setInterval(() => {
+        if (i < words.length) {
+          targetSpan.textContent = words.slice(0, i + 1).join(" ");
+          const c = document.getElementById("conversation");
+          if (c) c.scrollTop = c.scrollHeight;
+          i++;
+        } else {
+          clearInterval(_wordRevealTimer);
+          _wordRevealTimer = null;
+        }
+      }, msPerWord);
+    }
+
+    function doSpeak() {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length) {
+        const chosen = pickVoice(voices, cfg.voices, cfg.lang);
+        if (chosen) u.voice = chosen;
+      }
+      window.speechSynthesis.speak(u);
+      startWordReveal();
+    }
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = doSpeak;
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const socket = io();
   let selectedMode  = "general";
   let sessionActive = false;
@@ -748,6 +854,7 @@
     setStatus("Hold SPACE to speak  |  Q to quit");
     if (d.past_memories && d.past_memories.length) d.past_memories.forEach(m => addMemory(m));
     addCoachBubble("Whenever you're ready, I'm listening.");
+    speakText("Whenever you're ready, I'm listening.", null);
   }
 
   socket.on("connect",    () => setStatus("Connected"));
@@ -775,8 +882,10 @@
 
   socket.on("transcript",        d => addUserBubble(d.text));
   socket.on("coach_thinking",       () => showThinkingBubble());
-  socket.on("coach_response_start", () => replaceThinkingWithEmpty());
-  socket.on("coach_word",           d  => appendCoachWord(d.word));
+  socket.on("coach_response_start", d  => {
+    const span = replaceThinkingWithEmpty();
+    speakText(d.text, span);
+  });
   socket.on("emotion",           d => updateEmotion(d));
   socket.on("memories_retrieved",d => { d.memories.forEach(m => addMemory(m, true)); highlightMemories(d.memories); });
   socket.on("reflection",        d => { document.getElementById("reflectionText").textContent = d.text; document.getElementById("reflectionModal").classList.add("open"); });
@@ -832,7 +941,6 @@
   }
 
   let _coachTextSpan = null;
-  let _coachWordCount = 0;
 
   function replaceThinkingWithEmpty() {
     const c = document.getElementById("conversation");
@@ -843,15 +951,7 @@
     c.appendChild(el);
     c.scrollTop = c.scrollHeight;
     _coachTextSpan = el.querySelector("#coachLiveText");
-    _coachWordCount = 0;
-  }
-
-  function appendCoachWord(word) {
-    if (!_coachTextSpan) return;
-    _coachTextSpan.textContent += (_coachWordCount === 0 ? "" : " ") + word;
-    _coachWordCount++;
-    const c = document.getElementById("conversation");
-    c.scrollTop = c.scrollHeight;
+    return _coachTextSpan;
   }
 
   function addUserBubble(text) {
