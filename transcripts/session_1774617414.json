@@ -1,0 +1,27 @@
+{
+  "session_id": "session_1774617414",
+  "mode": "predate",
+  "use_prosody": false,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hi, I have a date with someone coming up in a week and I'm really excited for it. It's going to be our first date and I'm just a little bit nervous about what to wear for the date because I want to make an impression but I don't want to come off too strong. Can you help me out here?",
+      "mode": "semantic",
+      "emotion": "anxious"
+    },
+    {
+      "role": "agent",
+      "text": "Oh, hi! Yeah, sorry about being a little...anxious so far this session. Okay, your date, right? So, first of all, great that you're excited about it! That's awesome. Okay, let's talk about what to wear. I think the key here is to find a balance between making a good impression and not coming on too strong. You want to show that you've put effort into your appearance without being overdressed or trying too hard. Does that make sense? What kind of vibe are you going for with this date? Is it more casual, like grabbing coffee, or is it a bit more formal, like dinner at a nice restaurant?"
+    },
+    {
+      "role": "user",
+      "text": "It is a daytime date with grabbing coffee and hanging out in a park.",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "That sounds lovely. For a casual daytime date, you'll want to dress in a way that's comfortable yet put-together. You know, jeans and a nice top or a sundress would be great options for that kind of setting. Just make sure your clothes are clean and ironed, and pay attention to the details - like polishing your shoes and making sure your hair is tidy. It's also a good idea to dress according to the weather forecast. If it's going to be sunny, you'll want something light-colored, and if it's going to be cooler, add a layer. Oh, and don't forget to wear sunscreen and a hat if you need to. Sorry, sorry, I'm just...uh, yeah. Just make sure you're feeling confident in what you're wearing, okay?"
+    }
+  ]
+}

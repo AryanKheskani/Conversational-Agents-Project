@@ -1,0 +1,55 @@
+{
+  "session_id": "session_1774614307",
+  "mode": "predate",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello, nice to meet you.",
+      "mode": "prosody+semantic",
+      "emotion": "content",
+      "valence": 0.677,
+      "arousal": 0.437
+    },
+    {
+      "role": "agent",
+      "text": "Nice to meet you too! I'm doing well, thanks for asking. It's always great to chat with someone new and learn about their interests. What brings you here today?"
+    },
+    {
+      "role": "user",
+      "text": "Yeah, so I have been talking to this guy and met on Tinder and we've been having some conversation and it was really awkward at first but now he's asked if I want to go on a date with him but I'm actually very nervous and on first dates I always overthink a little bit and I'm anxious and I don't really come across someone who's very confident and I'm kind of very worried that that will really ruin my like our experience and I wanted some advice.",
+      "mode": "prosody+semantic",
+      "emotion": "anxious",
+      "valence": -0.367,
+      "arousal": 0.736
+    },
+    {
+      "role": "agent",
+      "text": "Oh, I think...I think that's completely normal, to be honest. I mean, it's totally natural to feel nervous on a first date, especially when you're not sure what to expect or if the other person is genuinely interested in getting to know you. It sounds like you're worried about projecting confidence, but I think that's actually a really admirable trait - wanting to be confident and present on a date. Maybe it's just a matter of taking some deep breaths, being yourself, and trying not to overthink things too much? I mean, your date has asked you out, which means they're interested in getting to know you, right? Do...do you think there's anything specific that's making you anxious about this particular date? Is it the guy himself, or is it more about the whole dating experience in general?"
+    },
+    {
+      "role": "user",
+      "text": "I think it's just a whole dating experience. Like I've been on a couple of dates here, but they didn't go well because there was like some awkwardness from the goal. And I think, and that actually ruined my experience because then I wasn't able to be myself. But the guy himself seems very nice, but I think it's just the way I approach dating. So I really want some advice on some, maybe you can tell me some of the stuff that I can do before to feel less awkward or more confident.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.04,
+      "arousal": 0.411
+    },
+    {
+      "role": "agent",
+      "text": "It can be tough when past experiences shape our expectations and anxieties about future dates. To help you feel more confident and prepared, here are a few suggestions: Firstly, try to relax your expectations. Don't put too much pressure on the date to be perfect or for everything to go exactly as planned. Remember that it's okay if things don't go exactly as expected – it's all about getting to know each other and having a good time. Before the date, take some time to focus on yourself. Get ready, do something you enjoy, and try to clear your mind of any pre-date jitters. You could also try doing some light self-care activities, like meditation or deep breathing exercises, to help calm your nerves. In terms of approaching dating itself, I'd recommend trying to be more open-minded and flexible. Don't put too much emphasis on finding someone who checks all the boxes – focus on having fun and getting to know someone new. And try not to worry so much about what others might think of you – remember that everyone has their own quirks and flaws! On the date itself, try to focus on the present moment and engage with your partner. Ask them questions, listen actively, and try to find common ground. Don't overthink things too much – just enjoy the conversation and see where it takes you. Lastly, remember that it's okay if things don't go exactly as planned. It's not about being perfect; it's about having a good time and getting to know someone new. So, take a deep breath, relax, and be yourself!"
+    },
+    {
+      "role": "user",
+      "text": "Yeah, thank you so much. I was really good advice. I feel like getting ready before a date and really having some self-care actually makes would make me more calm and and I just maybe you could tell me like a do-or-tree opening ideas of what I should ask and so the conversation doesn't feel like small though but it actually starts off really nice.",
+      "mode": "prosody+semantic",
+      "emotion": "content",
+      "valence": 0.593,
+      "arousal": 0.394
+    },
+    {
+      "role": "agent",
+      "text": "I'm glad to hear that the advice is helpful! Getting ready beforehand can definitely help you feel more centered and calm. And, of course, self-care is essential for taking care of yourself. Now, let's talk about conversation starters! I'd be happy to share some ideas with you. Here are a few fun ones: \"Have you traveled anywhere exciting recently?\" or \"What's on your bucket list?\" \"Do you have any fun plans for the rest of the year?\" or \"What are you looking forward to trying in the next few months?\"\n* \"Where did you grow up, and what's your favorite memory from there?\" Remember, the goal is to start with light and casual topics that allow you both to get to know each other. You can always dive deeper into more meaningful conversations as the date goes on. Also, don't be afraid to share a bit about yourself! It's okay to talk about your own interests, hobbies, or passions. Just be sure to listen actively and show genuine interest in getting to know your partner better. Feel free to pick and choose from these ideas, or use them as inspiration to come up with your own conversation starters. Good luck on your date, and I hope it's a wonderful time for both of you!"
+    }
+  ]
+}

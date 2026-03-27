@@ -1,0 +1,19 @@
+{
+  "session_id": "session_1774616548",
+  "mode": "predate",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "I don't know where to take her out for dinner. She's allergic to nuts, seafood, meat, she's vegetarian and I don't know where to go in Amsterdam for food. And I have one out left. What should I do?",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.474,
+      "arousal": 0.35
+    },
+    {
+      "role": "agent",
+      "text": "It sounds like you're having a bit of a challenging time finding a suitable dining option for your date in Amsterdam. Don't worry, I'm here to help. Since she has several dietary restrictions, it's essential to find a restaurant that can accommodate her needs. Have you considered looking into vegetarian or vegan restaurants specifically? Many cities, including Amsterdam, have a growing number of plant-based options that are nut-free and seafood-free. You might also want to try searching online for \"vegetarian restaurants in Amsterdam\" or \"vegan restaurants in Amsterdam\" to get some recommendations. Some popular neighborhoods like the Jordaan, De Pijp, and Oud-Zuid often have a good selection of cafes and restaurants that cater to various dietary needs. Additionally, you can also consider asking your date about her favorite types of cuisine or dishes she's particularly fond of. This might give you an idea of what type of restaurant would be suitable for her. Lastly, don't worry too much about the one out option – sometimes, it's not about the food itself but about spending quality time together and getting to know each other better."
+    }
+  ]
+}
