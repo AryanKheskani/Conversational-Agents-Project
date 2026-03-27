@@ -1,0 +1,47 @@
+{
+  "session_id": "session_1774618946",
+  "mode": "predate",
+  "use_prosody": false,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "Hello. How can I assist you today?"
+    },
+    {
+      "role": "user",
+      "text": "I have a date today. I'm super excited for it and I would like to know some recommendations on what I should wear for the date.",
+      "mode": "semantic",
+      "emotion": "content"
+    },
+    {
+      "role": "agent",
+      "text": "That's wonderful! Congratulations on your date, by the way. Now, let's get to the fun part – finding the perfect outfit. For a great first impression, you'll want to make sure you feel confident and comfortable in what you're wearing. Can you tell me a bit more about the date? Is it daytime or evening, and are there any specific activities planned? That will help me give you some tailored advice on what to wear."
+    },
+    {
+      "role": "user",
+      "text": "Okay, so the date is in the afternoon which we're going to a museum after that will be grabbing some dinner and some drinks afterwards.",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "That sounds like a lovely combination of activities. For an afternoon date at the museum, I'd recommend dressing in a way that's elegant yet understated. You want to show your interest and enthusiasm for the date, but also not draw too much attention away from the conversation. For women, a pair of dark wash jeans or a skirt with a nice blouse would be a great starting point. Add a light jacket or cardigan to layer over it, and you'll be comfortable while still looking polished. For men, a button-down shirt or a sweater with dress pants would be a good choice. Shoes should be dressed up but not too formal. What's your personal style like? Do you have any specific pieces that you feel particularly confident in?"
+    },
+    {
+      "role": "user",
+      "text": "There's nothing specific but since it's going to be super cold outside I would recommend something that will keep me warm So could you recommend something which will keep me warm throughout the day?",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "Considering the outdoor activity and the museum visit, it's a good idea to prioritize warmth while still looking presentable. For women, a pair of dark wash jeans or leggings with a thermal top would be a great combination. You could also consider a sweater dress or a skirt with tights and a warm blouse underneath for added layering options. For men, a fleece-lined shirt or a sweater over a thermal base layer would provide good warmth without sacrificing style. Additionally, consider bringing a light scarf or wrap to add an extra layer of warmth while you're walking between the museum and dinner spots. And don't forget to check the weather forecast beforehand to ensure you're prepared for any extreme cold snaps. Is there anything specific you'd like to prioritize in terms of style versus functionality?"
+    }
+  ]
+}

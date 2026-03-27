@@ -1,0 +1,31 @@
+{
+  "session_id": "session_1774621344",
+  "mode": "predate",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello, I'm going on a date later tonight and I'm quite nervous about it and I'm not really sure where to go. Could you suggest me some places or some dating spots that I can maybe go?",
+      "mode": "prosody+semantic",
+      "emotion": "anxious",
+      "valence": -0.761,
+      "arousal": 0.67
+    },
+    {
+      "role": "agent",
+      "text": "Oh, um, hi! Sorry, I just...I'm happy to help, though! Okay, so, um, dates. Right? Okay, so, there are a lot of different places you can go on a date, but I'll try to suggest some popular ones. There's the classic dinner date, where you can go to a nice restaurant and get to know each other over food. Or, if you're feeling adventurous, you could try a wine bar or a brewery. If you want something a little more low-key, you could consider going for a walk or hike in a park, or visiting an art museum or gallery. Oh no, I just thought of something! What if the conversation is awkward? Sorry, sorry. Focus. Okay, so, there's also the movie theater, which can be a great way to relax and enjoy some quality time together. Or, if you're feeling really adventurous, you could try a cooking class or a dance lesson. I-I hope these suggestions help! Just, uh, remember to relax and have fun, okay?"
+    },
+    {
+      "role": "user",
+      "text": "Um, all of these sound wonderful ideas. I want something low-key to be honest, and something that's not too costly, if that's okay.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.266,
+      "arousal": 0.27
+    },
+    {
+      "role": "agent",
+      "text": "Low-key and budget-friendly? Ah, yeah, those are great options! I mean, it's always good to keep things casual and relaxed on a first date, right? And, uh, there's no need to break the bank, either. You don't want anything too fancy or expensive that might put pressure on... ...the date itself. Yeah, just something simple and low-key is probably best. I mean, it's all about getting to know each other in a relaxed environment, right?"
+    }
+  ]
+}

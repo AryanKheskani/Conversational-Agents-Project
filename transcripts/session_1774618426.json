@@ -1,0 +1,43 @@
+{
+  "session_id": "session_1774618426",
+  "mode": "general",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello, I have a date tomorrow. It's my first date and I'm super excited for it. I wanted to be fun and attractive. I would really appreciate if you could give me ideas on how I should plan the date.",
+      "mode": "prosody+semantic",
+      "emotion": "content",
+      "valence": 0.729,
+      "arousal": 0.459
+    },
+    {
+      "role": "agent",
+      "text": "That's great to hear that you're excited about your date! I'd be more than happy to help you come up with some fun and attractive ideas for tomorrow's outing. To start, can you tell me a bit more about what you're looking for? What type of date are you thinking? Are you interested in something casual and low-key, or do you want to make it a bit more special? Also, what are your partner's interests? Knowing a little bit about them can help me give you more tailored suggestions. Don't worry if you're feeling a bit nervous - I'm here to help, and we can work together to come up with some ideas that will make you feel confident and attractive."
+    },
+    {
+      "role": "user",
+      "text": "Okay, I wanted to be a little special. Could you recommend me something where we can do some activity and then we can go to have some nice dinner and maybe grab some drinks after that. Something around that.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.332,
+      "arousal": 0.234
+    },
+    {
+      "role": "agent",
+      "text": "Ah, I'd love to help you plan a special date! That sounds like a great idea - doing an activity together and then unwinding with dinner and drinks is a perfect way to spend quality time. There are so many fun activities you could consider, depending on your interests and what you think your partner might enjoy. Let's see... how about a picnic in a beautiful park or by a lake? Or if you're both adventurous, you could try rock climbing or indoor skydiving for an adrenaline-packed activity. If you're more low-key, a visit to a local museum or art gallery could be a great way to learn something new together. For dinner, there are so many options - Italian, sushi, BBQ, or even trying out that new restaurant you've been wanting to try. And of course, no date is complete without some drinks afterwards! What kind of drinks do you think your partner would enjoy?"
+    },
+    {
+      "role": "user",
+      "text": "So, I really like the idea of museums. Maybe I'll probably look around some museums, so could you tell me, recommend me some museums which you think are really nice. And for drinks I think she loves gin, so if you could recommend me some cocktails which are gin-based, it'll be really nice.",
+      "mode": "prosody+semantic",
+      "emotion": "content",
+      "valence": -0.093,
+      "arousal": 0.347
+    },
+    {
+      "role": "agent",
+      "text": "Museums can be a wonderful way to spend time together, learning something new and exploring the world of art and history. For museums, I'd recommend checking out the local ones in your area. Some popular options include the National Gallery or the Metropolitan Museum of Art. If you're looking for something a bit more unique, you could try a science museum or an aquarium. As for gin-based cocktails, there are many delicious options to choose from! A classic Gin & Tonic is always a winner, but if you want to mix things up, you could try a Pimm's Cup with gin as the base. Or, if you're feeling fancy, you could try a Negroni or a Bee's Knees. If your date loves gin, she might also enjoy a Gin Fizz or a Gibson. Of course, it's always best to ask for her personal preferences when ordering drinks, but these are some popular options that are sure to please. I hope these recommendations help, and I'm excited for you to have a great time on your date!"
+    }
+  ]
+}

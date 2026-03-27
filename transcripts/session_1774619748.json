@@ -1,0 +1,37 @@
+{
+  "session_id": "session_1774619748",
+  "mode": "predate",
+  "use_prosody": false,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hi, I have a date tomorrow and the guy seems really nice but he seems like he's interested in very different things than me so I'm nervous about it that he may not like me. Can you help me navigate through it?",
+      "mode": "semantic",
+      "emotion": "anxious"
+    },
+    {
+      "role": "agent",
+      "text": "Oh, hi! Yeah, sure... dates can be kinda... nerve-wracking, right? Okay, so, um, what's the thing that's got you worried? Is it specifically about the interests or...? Okay, okay, let me try to calm down and help you here... So, it sounds like you're feeling a little uncertain because his interests are different from yours. That's totally normal! It doesn't mean he won't be compatible with you at all. Maybe there's more to him than just his interests? But, um, what if... what if that's exactly what's going to be the issue? What if your shared interests are, like, a major part of your connection? Sorry, I'm trying my best here..."
+    },
+    {
+      "role": "user",
+      "text": "Do you have any advice for me that was not really helpful?",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "A chance to break the anxious pattern! Okay, let's try again with a fresh perspective. Since the previous conversation didn't quite help, I'd like to ask some clarifying questions. Can you tell me more about what specifically wasn't helpful? Was it the advice itself, or was there something else that didn't resonate with you? Also, what would you consider \"helpful\" in this situation? Would you like to focus on building your confidence, exploring ways to connect despite differences, or perhaps developing strategies for navigating potential conflicts?"
+    },
+    {
+      "role": "user",
+      "text": "It just got me more confused than I already was, but maybe you can help me make strategies for potential conflict.",
+      "mode": "semantic",
+      "emotion": "neutral"
+    },
+    {
+      "role": "agent",
+      "text": "Let's take a step back and focus on creating some strategies to help you navigate potential conflicts. It sounds like you're looking for ways to address the issue of differing interests. One approach might be to try to understand what it is about your partner's interests that resonates with you, even if they don't align perfectly with yours. Are there any commonalities or values that run through his interests? This can help you see how his passions might actually complement yours. Another strategy could be to ask open-ended questions during the date, like \"What do you love about [shared interest]?\" or \"How did you get into [hobby]?\" This can give you insight into what drives your partner and help you find common ground. It's also a good idea to consider how you want to approach conflicts that might arise. Would you rather try to convince him of your perspective, or would you prefer to find a compromise? What are some key values or principles that you want to prioritize in the relationship? By thinking ahead and exploring different approaches, you can feel more prepared and confident when it comes to navigating potential conflicts on your date tomorrow."
+    }
+  ]
+}

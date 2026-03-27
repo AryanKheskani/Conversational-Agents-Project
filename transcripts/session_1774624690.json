@@ -1,0 +1,37 @@
+{
+  "session_id": "session_1774624690",
+  "mode": "predate",
+  "use_prosody": false,
+  "turns": [
+    {
+      "role": "user",
+      "text": "As hello, I'm going to have a date tomorrow with someone I've been speaking a bit with and I'm a bit nervous about what to do. So I was thinking if you have some advice on things I can say maybe to relate to them better or ways I can behave.",
+      "mode": "semantic",
+      "emotion": "anxious"
+    },
+    {
+      "role": "agent",
+      "text": "Oh, um, hi! Ah, dating, yeah... that's, uh, exciting, right? Okay, okay, advice, you say? Well, one thing that might help is to actually talk about your shared interests or hobbies. If you've been discussing those online, try bringing them up in conversation. It can be a great way to build rapport and find common ground. Another thing... Ah, I'm getting nervous again... Sorry! Just, uh, just make sure to listen actively. Pay attention to what they're saying and show interest in their thoughts and experiences. People generally like feeling heard and understood. And, oh, behavior-wise... Try not to be too much of a nervous wreck, I guess. Just relax and be yourself. If you can help it, avoid talking about sensitive topics or anything that might make the other person uncomfortable. And, um, try to ask open-ended questions instead of yes/no ones. It'll give you more material for conversation. I-I hope that helps a bit? Do you want me to think of any more things?"
+    },
+    {
+      "role": "user",
+      "text": "Yes, I always get very fidgety when I'm nervous. Is there any way I think maybe I shouldn't behave or ways that advice for what could help?",
+      "mode": "semantic",
+      "emotion": "anxious"
+    },
+    {
+      "role": "agent",
+      "text": "Oh no, fidgetiness can be a real... um, social faux pas. Okay, okay, so if you're worried about it, maybe try to... uh, take some deep breaths before the date. And, ah, try to sit up straight and avoid touching your face or hair too much. It's just, you know, subtle movements can give away your nervousness. As for ways to behave, hmm... I think it might be a good idea to ask open-ended questions and listen actively, like I said before. That way, you're not distracted by your own thoughts, and you can focus on the other person. And try to, uh, avoid interrupting or finishing their sentences for them. It's just a good idea to let them finish speaking. Oh, and, ah, try to use positive body language! Smile, make eye contact... Wait, is it okay if I say that? Am I being too pushy with my advice?"
+    },
+    {
+      "role": "user",
+      "text": "No, no, I think you're on the right line. I'm just wondering it's a restaurant to date. So is there anything specific more to the place we'll be in?",
+      "mode": "semantic",
+      "emotion": "surprised"
+    },
+    {
+      "role": "agent",
+      "text": "A restaurant... okay, that's... um, different from other dates, I guess. Well, in that case, you might want to... uh, take note of the ambiance and atmosphere of the restaurant beforehand. If it's a fancy place or a cozy spot, you can use that as conversation starter. For example, if it's a busy restaurant, you could talk about how they manage to keep everything so organized and efficient. Or if it's a quiet little bistro, you could comment on how nice it is to have a peaceful meal. And, um, don't forget to ask for recommendations! The waiter or the person who made your reservations might be able to give you some insider info on the menu. It's a good way to show interest and get more information out of them. Oh, and... uh, try not to overthink it too much? I mean, it's just dinner, right?"
+    }
+  ]
+}

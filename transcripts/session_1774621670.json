@@ -1,0 +1,43 @@
+{
+  "session_id": "session_1774621670",
+  "mode": "general",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello again. I am going on a date later this afternoon and I would like some advice in regards to some fire drip that I should wear for the date. Please help.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.348,
+      "arousal": 0.217
+    },
+    {
+      "role": "agent",
+      "text": "It sounds like you're looking for fashion advice for your date. Fire drip is quite an unusual term, though - are you referring to a specific type of clothing or accessory? Could you provide more context or clarify what you mean by \"fire drip\"? I'll do my best to offer helpful suggestions without taking any stance on style or personal preference."
+    },
+    {
+      "role": "user",
+      "text": "Yes, I meant clothing that would be acceptable for a date.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.325,
+      "arousal": 0.247
+    },
+    {
+      "role": "agent",
+      "text": "When it comes to dressing for a date, it's generally a good idea to prioritize comfort and confidence. Since you're looking for something \"fire\" , I'd recommend considering the following: Consider your date's style and preferences. You wouldn't want to upstage them or make them feel uncomfortable with your attire.\n* Think about the location and atmosphere of the date. If it's outdoors or in a casual setting, you might prioritize practicality over formality. As for specific clothing items, I can offer some general suggestions. Would you like me to recommend something from a particular category ?"
+    },
+    {
+      "role": "user",
+      "text": "I'm really nervous about this and I don't really know what to say, what conversation I should discuss, what topics should I even bring up. I don't know, I don't feel like I know her that well, so what should I do?",
+      "mode": "prosody+semantic",
+      "emotion": "anxious",
+      "valence": -0.764,
+      "arousal": 0.673
+    },
+    {
+      "role": "agent",
+      "text": "It's completely normal to feel nervous before a date, especially if you're not sure about the other person. Okay, okay, let me try to calm myself down... First of all, remember that it's okay to not know everything about your date beforehand. The goal is to have a good time and get to know each other, not to interview or interrogate them. One thing you could try is to focus on finding common ground. Think about what interests you do have in common with the person you're going out with. It could be something as simple as a shared hobby, favorite TV show, or food. Also, don't feel like you need to stick to super serious or deep topics right off the bat. You can start with some light and casual conversation starters, like \"How was your week?\" or \"What do you like to do in your free time?\" The key is to be yourself, relax, and let the conversation flow naturally. Don't worry too much about saying \"the right\" things – just enjoy getting to know each other and see where things go. Oh, and one more thing: it's okay if there are some awkward moments or silences. That's all part of the process! Just roll with it and move on to something else."
+    }
+  ]
+}

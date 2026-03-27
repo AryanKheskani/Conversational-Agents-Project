@@ -142,24 +142,24 @@ def on_end_session():
     stm = _session["stm"]
     ltm = _session["ltm"]
 
-    # Generate reflection if not in postdate mode
-    if _session["mode"] != "postdate" and stm and len(stm.get_user_turns()) > 0:
-        emit("status", {"msg": "Generating session reflection..."})
-        last_turn = stm.get_user_turns()[-1]
+    # # Generate reflection if not in postdate mode
+    # # if _session["mode"] != "postdate" and stm and len(stm.get_user_turns()) > 0:
+    # #     emit("status", {"msg": "Generating session reflection..."})
+    # #     last_turn = stm.get_user_turns()[-1]
 
-        class _Proxy:
-            def __init__(self, t):
-                self.text                  = t.text
-                self.emotional_label       = t.emotional_label
-                self.emotional_valence     = t.emotional_valence
-                self.emotional_arousal     = t.emotional_arousal
-                self.fusion_confidence     = t.fusion_confidence
-                self.has_semantic_conflict = t.has_conflict
-                self.conflict_note         = ""
+    #     class _Proxy:
+    #         def __init__(self, t):
+    #             self.text                  = t.text
+    #             self.emotional_label       = t.emotional_label
+    #             self.emotional_valence     = t.emotional_valence
+    #             self.emotional_arousal     = t.emotional_arousal
+    #             self.fusion_confidence     = t.fusion_confidence
+    #             self.has_semantic_conflict = t.has_conflict
+    #             self.conflict_note         = ""
 
-        ctx        = _session["retriever"].build_context(_Proxy(last_turn))
-        reflection = _session["coach"].reflect(ctx)
-        emit("reflection", {"text": reflection})
+    #     ctx        = _session["retriever"].build_context(_Proxy(last_turn))
+    #     reflection = _session["coach"].reflect(ctx)
+    #     emit("reflection", {"text": reflection})
 
     summary = end_session(stm, ltm, salience_floor=0.4, run_prune=True)
     _session["running"] = False
