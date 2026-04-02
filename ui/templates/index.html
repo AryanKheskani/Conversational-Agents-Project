@@ -214,6 +214,30 @@
       line-height: 1.45;
     }
 
+    .toggle-btn {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      transition: all 0.15s;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .toggle-btn:hover { border-color: var(--gold); background: rgba(255,127,81,0.04); }
+
+    .toggle-btn.recording {
+      border-color: var(--red);
+      background: rgba(114,0,38,0.07);
+      animation: pulse 1.2s ease infinite;
+    }
+
     /* ── Main ─────────────────────────────────────────────────── */
     .main {
       display: flex;
@@ -705,13 +729,20 @@
     <div class="conversation hidden" id="conversation"></div>
 
     <div class="bottom-bar hidden" id="bottomBar">
-      <div class="status-text" id="statusBar">Hold SPACE to speak</div>
+      <div class="status-text" id="statusBar">Hold SPACE to speak  |  S to toggle</div>
+
       <button class="ptt-btn" id="pttBtn"
               onmousedown="startRecording()" onmouseup="stopRecording()"
               ontouchstart="startRecording()" ontouchend="stopRecording()">
         <span class="ptt-icon">🎙</span>
         <span class="ptt-label">Hold</span>
       </button>
+
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleRecording()">
+        <span class="ptt-icon">⏺</span>
+        <span class="ptt-label">Toggle</span>
+      </button>
+
       <button class="end-btn" onclick="endSession()">End session</button>
     </div>
 
@@ -917,15 +948,42 @@
 
   function closeModal() { document.getElementById("reflectionModal").classList.remove("open"); }
 
-  document.addEventListener("keydown", e => {
-    if (!sessionActive) return;
-    if (e.code === "Space" && !e.repeat) { e.preventDefault(); startRecording(); document.getElementById("pttBtn").classList.add("recording"); }
-    if (e.code === "KeyQ") socket.emit("stop_recording");
-  });
+  // ── Recording toggle ──────────────────────────────────────
+    let sRecording = false;
 
-  document.addEventListener("keyup", e => {
-    if (e.code === "Space") { stopRecording(); document.getElementById("pttBtn").classList.remove("recording"); }
-  });
+    function toggleRecording() {
+      if (!sessionActive) return;
+      if (!sRecording) {
+        sRecording = true;
+        startRecording();
+        document.getElementById("toggleBtn").classList.add("recording");
+        document.getElementById("toggleBtn").querySelector(".ptt-icon").textContent = "⏹";
+      } else {
+        sRecording = false;
+        stopRecording();
+        document.getElementById("toggleBtn").classList.remove("recording");
+        document.getElementById("toggleBtn").querySelector(".ptt-icon").textContent = "⏺";
+      }
+    }
+
+    // ── Keyboard shortcuts ────────────────────────────────────
+    document.addEventListener("keydown", e => {
+      if (!sessionActive) return;
+      if (e.code === "Space" && !e.repeat) {
+        e.preventDefault();
+        startRecording();
+        document.getElementById("pttBtn").classList.add("recording");
+      }
+      if (e.code === "KeyS" && !e.repeat) toggleRecording();
+      if (e.code === "KeyQ") socket.emit("stop_recording");
+    });
+
+    document.addEventListener("keyup", e => {
+      if (e.code === "Space") {
+        stopRecording();
+        document.getElementById("pttBtn").classList.remove("recording");
+      }
+    });
 
   let _thinkingEl = null;
 

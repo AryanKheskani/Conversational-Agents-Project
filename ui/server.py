@@ -195,7 +195,7 @@ def _run_turn():
     try:
         # Record
         socketio.emit("status", {"msg": "🔴 Recording... release to stop"})
-        audio_file = record_audio()
+        audio_file = record_audio(external_stop=_shutdown, auto_start=True)
 
         if audio_file is None:
             socketio.emit("recording_stopped", {})

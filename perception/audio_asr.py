@@ -29,25 +29,36 @@ def transcribe_audio(audio_path: str) -> str:
     result = _model.transcribe(audio_path)
     return result["text"].strip()
 
-def record_audio(filename="temp_recording.wav"):
-    """
-    Push-to-talk recording: hold SPACE to record, release to stop.
-    Records until the user releases the spacebar.
-    Records audio from the microphone for a specified duration and saves it to a .wav file.
-    """
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
+def record_audio(filename="temp_recording.wav", external_stop: threading.Event = None, auto_start: bool = False):
+    CHUNK    = 1024
+    FORMAT   = pyaudio.paInt16
     CHANNELS = 1
-    RATE = 16000
+    RATE     = 16000
 
-    press_event = threading.Event()
+    press_event   = threading.Event()
     release_event = threading.Event()
-    frames = []
-    sample_width = [0]  # mutable container to pass value out of thread
+    quit_event    = threading.Event()
+    frames        = []
+    sample_width  = [0]
+
+    # Auto-start from browser — no keypress needed
+    if auto_start:
+        press_event.set()
 
     def on_press(key):
         if key == keyboard.Key.space:
             press_event.set()
+        elif hasattr(key, 'char') and key.char == 's':
+            if not press_event.is_set():
+                press_event.set()
+            else:
+                release_event.set()
+                return False
+        elif hasattr(key, 'char') and key.char == 'q':
+            quit_event.set()
+            press_event.set()
+            release_event.set()
+            return False
 
     def on_release(key):
         if key == keyboard.Key.space:
@@ -56,39 +67,49 @@ def record_audio(filename="temp_recording.wav"):
 
     def record_thread():
         p = pyaudio.PyAudio()
-        sample_width[0] = p.get_sample_size(FORMAT)  # capture before terminate
+        sample_width[0] = p.get_sample_size(FORMAT)
         stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE,
                         input=True, frames_per_buffer=CHUNK)
 
-        # Wait for spacebar before capturing frames
         press_event.wait()
-        print("🔴 Recording...")
 
-        # Drain buffered audio from before keypress
-        stream.read(stream.get_read_available(), exception_on_overflow=False)
-
-        while not release_event.is_set():
-            data = stream.read(CHUNK, exception_on_overflow=False)
-            frames.append(data)
+        if not quit_event.is_set():
+            print("🔴 Recording...")
+            stream.read(stream.get_read_available(), exception_on_overflow=False)
+            while not release_event.is_set():
+                if external_stop and external_stop.is_set():
+                    release_event.set()
+                    break
+                data = stream.read(CHUNK, exception_on_overflow=False)
+                frames.append(data)
 
         stream.stop_stream()
         stream.close()
         p.terminate()
 
-    print("\n🎙️  Hold SPACE to speak, release to stop...")
+    if not auto_start:
+        print("\n🎙️  Hold SPACE to speak, release to stop  |  S to toggle  |  Q to quit...")
 
-    # Start recording thread first
     t = threading.Thread(target=record_thread, daemon=True)
     t.start()
 
-    # Keyboard listener runs on main thread — not blocked by audio I/O
-    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-        listener.join()
+    if auto_start:
+        # Browser mode — no keyboard listener needed, just wait for external_stop
+        release_event.wait()
+        t.join()
+    else:
+        # Terminal mode — keyboard listener drives start/stop
+        with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+            listener.join()
+        t.join()
 
-    # Wait for recording thread to finish cleanly
-    t.join()
+    if quit_event.is_set():
+        return None
 
-    print("✅ Finished recording.")
+    print("✅ Done.")
+
+    if not frames:
+        return None
 
     with wave.open(filename, 'wb') as wf:
         wf.setnchannels(CHANNELS)
