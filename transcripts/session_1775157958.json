@@ -1,0 +1,43 @@
+{
+  "session_id": "session_1775157958",
+  "mode": "predate",
+  "use_prosody": true,
+  "turns": [
+    {
+      "role": "user",
+      "text": "Hello. Yesterday I met someone on Bumble and you know we texted a lot and we had some really fun together. I think the physical attraction at least from my side is also there. So yeah I asked for a date and then we are going to meet on Sunday. However, I don't think she is as enthusiastic as me. I felt like through the text. So I kind of need like I don't know. I feel nervous because you know I find her quite attractive and like you know for myself everything is going well. But from here I didn't observe the same thing. So when I go there I kind of feel like I don't know. I will not impress her but like this also found it weird because where am I to? I should not I should just be myself I know but like I don't know. I'm nervous.",
+      "mode": "prosody+semantic",
+      "emotion": "anxious",
+      "valence": -0.113,
+      "arousal": 0.507
+    },
+    {
+      "role": "agent",
+      "text": "Ah, yeah... so, uh, it sounds like you're feeling a little uncertain about the date on Sunday. That's totally normal, right? I mean, who doesn't get nervous before a first date, especially if things are moving quickly. So, what do you think is holding you back from feeling more confident about this? Is it just the fact that she didn't seem as enthusiastic in your conversations, or is there something else going on?"
+    },
+    {
+      "role": "user",
+      "text": "Yeah, she not being enthusiastic is one thing, but I think it's also like I have not been on a date for a while now And I kind of forgot like how I should be acting in these situations, you know and like I don't know I am nervous about for example if I'm gonna be overdressed underdressed or like If my hair will look good for example or We like get bored or we like be boring. I don't know. I feel like I lost my ability to prove for Such connections with people so I don't know maybe some advice will be nice",
+      "mode": "prosody+semantic",
+      "emotion": "anxious",
+      "valence": -0.128,
+      "arousal": 0.485
+    },
+    {
+      "role": "agent",
+      "text": "It's like, totally normal to feel a little uncertain about the date and just want to make sure everything is perfect for both of you. I mean, who doesn't want to put their best foot forward, right? It sounds like you're feeling a bit anxious about not knowing what to expect or how to present yourself in the best way possible. But here's the thing: it's okay if things don't go exactly as planned. Sometimes the most authentic and memorable moments come from being a little vulnerable and spontaneous. So, instead of worrying too much about overdressing or having perfect hair, why not try to focus on just being yourself and seeing where the date takes you? It sounds like you're feeling a bit uncertain about your ability to connect with people, but I think that's something that can be worked on over time. Maybe we can explore some strategies for building confidence in social situations?"
+    },
+    {
+      "role": "user",
+      "text": "Maybe that would be cool, yeah. I think I lost my ability because I had some several bad experiences. So I don't know. After those I feel quite triggered about making the approach, approaching the people in a romantic way, way I can say, and I don't know. Some advice about how I should lose my confidence about that will be nice.",
+      "mode": "prosody+semantic",
+      "emotion": "neutral",
+      "valence": -0.386,
+      "arousal": 0.361
+    },
+    {
+      "role": "agent",
+      "text": "I think it's amazing that you're acknowledging your past experiences as a trigger for your current anxiety. That takes a lot of courage, and it's okay to acknowledge that those experiences have had an impact on you. It sounds like you're feeling stuck in a pattern where your past experiences are influencing your behavior now. I want to assure you that you don't have to carry the weight of those experiences alone. It might be helpful to explore some strategies for reframing your thoughts and behaviors around approaching others romantically. One thing that might be helpful is to try to focus on the present moment, rather than getting caught up in worries about the past or future. What are some small, positive steps you could take this week to start building your confidence? For example, could you make a plan to meet someone new and have a friendly conversation with them? Also, I want to ask: what were some of those bad experiences that triggered your anxiety around making romantic approaches? Sometimes sharing more about our past can help us process and heal from it. Would you be willing to talk more about that?"
+    }
+  ]
+}
