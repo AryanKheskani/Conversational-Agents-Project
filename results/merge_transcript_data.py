@@ -6,6 +6,7 @@ TRANSCRIPTS_PATH = Path("transcript_sessions.csv")
 OUTPUT_PATH = Path("Results_with_session_ids.csv")
 
 AMSTERDAM_TZ = "Europe/Amsterdam"
+START_BUFFER_MINUTES = 2
 
 
 def condition_to_use_prosody(condition_value):
@@ -66,9 +67,11 @@ def first_match_session_id(transcripts_df, start_dt, end_dt, expected_use_prosod
     if pd.isna(start_dt) or pd.isna(end_dt) or expected_use_prosody is None:
         return "NA"
 
+    adjusted_start_dt = start_dt - pd.Timedelta(minutes=START_BUFFER_MINUTES)
+
     matches = transcripts_df[
         (transcripts_df["timestamp_local_dt"].notna()) &
-        (transcripts_df["timestamp_local_dt"] >= start_dt) &
+        (transcripts_df["timestamp_local_dt"] >= adjusted_start_dt) &
         (transcripts_df["timestamp_local_dt"] <= end_dt) &
         (transcripts_df["use_prosody"] == expected_use_prosody)
     ].copy()
@@ -124,6 +127,7 @@ def main():
     output_df.to_csv(OUTPUT_PATH, index=False)
 
     print(f"Saved merged file to: {OUTPUT_PATH}")
+    print(f"Allowed start buffer: {START_BUFFER_MINUTES} minute(s) before survey start")
     print(f"session_id_A matched rows: {(pd.Series(session_ids_a) != 'NA').sum()}")
     print(f"session_id_A unmatched rows: {(pd.Series(session_ids_a) == 'NA').sum()}")
     print(f"session_id_B matched rows: {(pd.Series(session_ids_b) != 'NA').sum()}")
